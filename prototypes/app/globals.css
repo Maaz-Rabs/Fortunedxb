@@ -6,30 +6,67 @@ html {
   scroll-behavior: smooth;
 }
 
-<<<<<<< Updated upstream
-/* Hide scrollbar but keep scrolling (opt-in via class) */
-=======
-/* Hide horizontal scrollbar on the project section-nav (prototype1). */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
->>>>>>> Stashed changes
+/* Hide scrollbar */
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-<<<<<<< Updated upstream
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
 /* Soft dissolve for swapped previews */
 @keyframes p4-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
+
 .p4-fade {
   animation: p4-fade 180ms ease;
 }
-=======
->>>>>>> Stashed changes
+
+/* Map labels (permanent tooltips) shown directly on the satellite map */
+.leaflet-tooltip.poi-label,
+.leaflet-tooltip.project-label {
+  background: rgba(255, 255, 255, 0.96);
+  border: none;
+  border-radius: 9px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  color: #2e2620;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  padding: 4px 9px;
+  white-space: nowrap;
+}
+
+.leaflet-tooltip.poi-label .poi-name {
+  display: block;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.leaflet-tooltip.poi-label .poi-mins {
+  display: block;
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 1.2;
+  color: #8c6a52;
+}
+
+.leaflet-tooltip.project-label {
+  background: #8c6a52;
+  color: #faf7f3;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 5px 11px;
+}
+
+.leaflet-tooltip.poi-label::before,
+.leaflet-tooltip.project-label::before {
+  display: none;
+}
