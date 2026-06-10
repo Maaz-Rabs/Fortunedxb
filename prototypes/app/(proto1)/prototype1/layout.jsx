@@ -4,7 +4,7 @@ export const metadata = { title: 'Fortune Realty L.L.C — Prototype 1' };
 export default function Prototype1Layout({ children }) {
   return (
     <div className="min-h-screen bg-[#F7F6F3] text-[#1A1A1A] flex flex-col font-sans">
-      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-black/[0.06] bg-white/85 px-6 md:px-12 py-3 backdrop-blur">
+      <header className="flex items-center justify-between border-b border-black/[0.06] bg-white px-6 md:px-12 py-3">
         <a href="/prototype1" className="inline-flex">
           <img src="/images/fortune-logo.png" alt="Fortune Realty L.L.C" className="h-9 w-auto" />
         </a>

@@ -7,7 +7,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Tooltip, useMap, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { ChevronDown, Train, Satellite, Map as MapIcon } from 'lucide-react';
+import { ChevronDown, Train, Satellite, Map as MapIcon, Car } from 'lucide-react';
 import { srcCandidates } from './img';
 
 // Inline white SVG glyphs (crisp inside Leaflet divIcons — no emoji).
@@ -116,8 +116,8 @@ function ScrollZoomGate({ onBlocked }) {
   return null;
 }
 
-export default function LocationMap({ geo, projectName, location, projectImage, projectImageFallback }) {
-  const [show, setShow] = useState({ landmarks: false, medicals: false, metros: true, schools: false });
+export default function LocationMap({ geo, projectName, location, projectImage, projectImageFallback, connectivity = [] }) {
+  const [show, setShow] = useState({ landmarks: false, medicals: false, metros: true, schools: false, nearby: false });
   const [open, setOpen] = useState(false);
   const [basemap, setBasemap] = useState('normal'); // 'realistic' | 'normal'
   const [hint, setHint] = useState(false);
@@ -270,9 +270,42 @@ export default function LocationMap({ geo, projectName, location, projectImage, 
                 <span className="relative h-5 w-9 rounded-full bg-black/15 transition-colors peer-checked:bg-[#16A34A] after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4" />
               </label>
             ))}
+
+            {connectivity.length > 0 && (
+              <>
+                <div className="my-1 border-t border-black/[0.06]" />
+                <label className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-[#3A3A3A] hover:bg-black/[0.03]">
+                  Nearby (drive times)
+                  <input
+                    type="checkbox"
+                    checked={show.nearby}
+                    onChange={() => toggle('nearby')}
+                    className="peer sr-only"
+                  />
+                  <span className="relative h-5 w-9 rounded-full bg-black/15 transition-colors peer-checked:bg-[#16A34A] after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4" />
+                </label>
+              </>
+            )}
           </div>
         )}
       </div>
+
+      {/* Nearby drive-times panel — toggled from the Show dropdown */}
+      {show.nearby && connectivity.length > 0 && (
+        <div className="absolute left-3 top-16 z-[1000] w-60 max-h-[320px] overflow-y-auto rounded-xl border border-black/10 bg-white/95 p-3 shadow-lg backdrop-blur [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <p className="mb-2 inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#1A1A1A]">
+            <Car size={13} className="text-[#B0905E]" /> Nearby — drive times
+          </p>
+          <ul className="space-y-1.5">
+            {connectivity.map((c) => (
+              <li key={c.place} className="flex items-center justify-between gap-3 text-[12px] text-[#3A3A3A]">
+                <span>{c.place}</span>
+                <span className="shrink-0 font-semibold text-[#1A1A1A]">{c.time}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Metro Lines legend (bottom-right) */}
       <div className="absolute bottom-3 right-3 z-[1000] rounded-xl border border-black/10 bg-white/95 p-3 shadow-lg backdrop-blur">

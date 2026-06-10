@@ -48,7 +48,7 @@ export default function SectionNav({ tabs }) {
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="flex items-center gap-3 py-2.5">
           <div className="relative min-w-0 flex-1">
-            <nav ref={navRef} className="flex items-center gap-1 overflow-x-auto scroll-smooth no-scrollbar pr-6">
+            <nav ref={navRef} className="flex items-center gap-1 overflow-x-auto scroll-smooth pr-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {tabs.map((t) => (
                 <button
                   key={t.id}

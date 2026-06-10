@@ -4,7 +4,6 @@
 // prototype1 ONLY. Mock data.
 import dynamic from 'next/dynamic';
 import { MapPin } from 'lucide-react';
-import Connectivity from './Connectivity';
 
 const LocationMap = dynamic(() => import('./LocationMap'), {
   ssr: false,
@@ -30,10 +29,9 @@ export default function Location({ geo, projectName, location, projectImage, pro
           location={location}
           projectImage={projectImage}
           projectImageFallback={projectImageFallback}
+          connectivity={connectivity}
         />
       </div>
-
-      {connectivity?.length > 0 && <Connectivity items={connectivity} />}
     </section>
   );
 }

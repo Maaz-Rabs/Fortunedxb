@@ -17,6 +17,12 @@ export default function SmartImg({ base, fallback, alt = '', className, onAllFai
 
   const advance = () => setI((n) => n + 1);
 
+  // Reset to the first candidate whenever the source changes (e.g. gallery swap),
+  // otherwise a stale extension index would point at the wrong/next image.
+  useEffect(() => {
+    setI(0);
+  }, [base, fallback]);
+
   useEffect(() => {
     const img = ref.current;
     if (img && img.complete && img.naturalWidth === 0) advance();
