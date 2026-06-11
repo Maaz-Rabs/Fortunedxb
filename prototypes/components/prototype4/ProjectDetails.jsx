@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import {
   Waves, Dumbbell, ShieldCheck, Trees, Car, ShoppingBag, Baby, Utensils,
   Sparkles, Film, Bike, Anchor, Home, Briefcase, BellRing, Wine, Check,
-  TrainFront, GraduationCap, Plane, HeartPulse, MapPin, ChevronUp, ChevronLeft, ChevronRight, Download, Eye, X,
+  TrainFront, GraduationCap, Plane, HeartPulse, MapPin, ChevronUp, ChevronLeft, ChevronRight, Download, Eye, X, Expand,
   Wallet, CalendarClock, Building2, TrendingUp, Percent, Plus,
 } from 'lucide-react';
 import { CURRENCIES, formatMoney, formatMoneyShort } from '@/mock/prototype4/currency';
@@ -21,6 +21,7 @@ const DOCS = '/mock/prototype4';
 const INPUT = 'w-full rounded-lg border border-[#e8e2da] px-3.5 py-2.5 text-sm text-[#2a2520] placeholder:text-[#9b9085] outline-none transition focus:border-[#80603f] focus:ring-2 focus:ring-[#80603f]/20';
 
 const img = (id) => `https://images.unsplash.com/${id}?w=1200&q=80&auto=format&fit=crop`;
+const GALLERY_LABELS = ['Exterior', 'Lobby', 'Amenities', 'Interiors', 'Surroundings', 'Skyline'];
 const planImageFor = (name) => {
   const n = name.toLowerCase();
   if (n.includes('4 bed')) return `${DOCS}/plan-4bed.svg`;
@@ -85,6 +86,7 @@ export default function ProjectDetails({ project }) {
   const [curIdx, setCurIdx] = useState(0);
   const [faqOpen, setFaqOpen] = useState(0);
   const [activeImg, setActiveImg] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
   const [planModal, setPlanModal] = useState(null);
   const [planIdx, setPlanIdx] = useState(0);
@@ -98,9 +100,10 @@ export default function ProjectDetails({ project }) {
   const gLen = project.gallery.length;
 
   useEffect(() => {
+    if (lightbox) return;
     const t = setInterval(() => setActiveImg((i) => (i + 1) % gLen), 5000);
     return () => clearInterval(t);
-  }, [gLen]);
+  }, [gLen, lightbox]);
 
   // scroll-spy: highlight the section nearest the top
   useEffect(() => {
@@ -198,58 +201,126 @@ export default function ProjectDetails({ project }) {
         </div>
       </nav>
 
-      {/* Hero carousel */}
-      <div className="relative h-[56vh] min-h-[360px] md:h-[66vh] overflow-hidden">
-        {project.gallery.map((g, i) => (
-          <img
-            key={i}
-            src={img(g)}
-            alt=""
-            className={`absolute inset-0 h-full w-full object-cover ${i === activeImg ? 'opacity-100' : 'opacity-0'}`}
-            style={{
-              transition: 'opacity 0.7s ease, transform 7s linear',
-              transform: i === activeImg ? 'scale(1.06)' : 'scale(1)',
-            }}
-          />
-        ))}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-black/10" />
-
-        <button
-          onClick={() => setActiveImg((activeImg - 1 + gLen) % gLen)}
-          aria-label="Previous"
-          className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur text-white flex items-center justify-center z-10 transition-colors"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <button
-          onClick={() => setActiveImg((activeImg + 1) % gLen)}
-          aria-label="Next"
-          className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur text-white flex items-center justify-center z-10 transition-colors"
-        >
-          <ChevronRight size={20} />
-        </button>
-
-        <div className="absolute bottom-0 left-0 right-0">
-          <div className="mx-auto max-w-6xl px-6 pb-12 text-white">
-            <h1 className="text-4xl md:text-6xl font-bold uppercase font-[family-name:var(--font-heading)] leading-tight">
-              {project.name}
-            </h1>
-            <p className="mt-1 text-white/85 text-sm flex items-center gap-1.5">
-              <MapPin size={15} /> {project.area} · {project.developer}
-            </p>
-          </div>
-        </div>
-
-        <div className="absolute bottom-5 right-6 flex gap-2 z-10">
-          {project.gallery.map((_, i) => (
-            <button
+      {/* Hero gallery — featured image (left) + vertical thumbnails (right) */}
+      <div className="mx-auto max-w-6xl px-6 pt-6">
+       <div className="grid gap-3 md:grid-cols-[1fr_120px]">
+        {/* Featured image */}
+        <div className="group relative aspect-[16/10] w-full overflow-hidden rounded-3xl bg-[#e6e1d8] md:aspect-auto md:h-[460px]">
+          {project.gallery.map((g, i) => (
+            <img
               key={i}
-              onClick={() => setActiveImg(i)}
-              aria-label={`Slide ${i + 1}`}
-              className={`h-2 rounded-full transition-all ${i === activeImg ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'}`}
+              src={img(g)}
+              alt=""
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === activeImg ? 'opacity-100' : 'opacity-0'}`}
             />
           ))}
+          <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-black/10" />
+
+          {/* caption + counter (prototype1 style) */}
+          <span className="absolute bottom-4 left-4 rounded-full bg-black/55 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white backdrop-blur-sm">
+            {GALLERY_LABELS[activeImg % GALLERY_LABELS.length]}
+          </span>
+          <span className="absolute bottom-4 right-4 rounded-full bg-black/55 px-3 py-1 text-[12px] font-medium text-white backdrop-blur-sm">
+            {activeImg + 1} / {gLen}
+          </span>
+
+          {/* expand */}
+          <button
+            type="button"
+            onClick={() => setLightbox(true)}
+            aria-label="View fullscreen"
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/85 text-[#2a2520] shadow transition hover:bg-white"
+          >
+            <Expand size={17} />
+          </button>
+
+          {/* arrows (on hover) */}
+          <button
+            type="button"
+            onClick={() => setActiveImg((activeImg - 1 + gLen) % gLen)}
+            aria-label="Previous"
+            className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-[#2a2520] opacity-0 shadow transition hover:bg-white group-hover:opacity-100"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveImg((activeImg + 1) % gLen)}
+            aria-label="Next"
+            className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-[#2a2520] opacity-0 shadow transition hover:bg-white group-hover:opacity-100"
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
+
+        {/* Thumbnails — vertical strip on the right (horizontal scroll on mobile) */}
+        <div className="no-scrollbar flex gap-3 overflow-x-auto pb-1 md:h-[460px] md:flex-col md:overflow-x-visible md:overflow-y-auto md:pb-0">
+          {project.gallery.map((g, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActiveImg(i)}
+              aria-label={`Image ${i + 1}`}
+              className={`relative aspect-[4/3] w-24 shrink-0 overflow-hidden rounded-2xl transition md:aspect-auto md:min-h-0 md:w-full md:flex-1 ${
+                i === activeImg
+                  ? 'ring-2 ring-[#80603f] ring-offset-2 ring-offset-[#faf7f3]'
+                  : 'opacity-70 hover:opacity-100'
+              }`}
+            >
+              <img src={img(g)} alt="" className="h-full w-full object-cover" />
+            </button>
+          ))}
+        </div>
+       </div>
+      </div>
+
+      {/* Fullscreen lightbox */}
+      {lightbox && (
+        <div className="fixed inset-0 z-[2000] flex flex-col bg-black/92 backdrop-blur-sm" onClick={() => setLightbox(false)}>
+          <div className="flex items-center justify-between px-5 py-4 text-white/80">
+            <span className="text-sm uppercase tracking-[0.18em]">
+              {project.name} · {activeImg + 1}/{gLen}
+            </span>
+            <button type="button" onClick={() => setLightbox(false)} className="rounded-full p-1.5 hover:bg-white/10">
+              <X size={22} />
+            </button>
+          </div>
+          <div className="relative flex flex-1 items-center justify-center px-4 pb-6" onClick={(e) => e.stopPropagation()}>
+            <button type="button" onClick={() => setActiveImg((activeImg - 1 + gLen) % gLen)} className="absolute left-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">
+              <ChevronLeft size={22} />
+            </button>
+            <div className="aspect-[16/10] w-full max-w-4xl overflow-hidden rounded-xl bg-black/30 shadow-2xl">
+              <img src={img(project.gallery[activeImg])} alt="" className="h-full w-full object-cover" />
+            </div>
+            <button type="button" onClick={() => setActiveImg((activeImg + 1) % gLen)} className="absolute right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">
+              <ChevronRight size={22} />
+            </button>
+          </div>
+          <div className="flex justify-center gap-2 px-4 pb-5" onClick={(e) => e.stopPropagation()}>
+            {project.gallery.map((g, i) => (
+              <button key={i} type="button" onClick={() => setActiveImg(i)} className={`h-12 w-16 overflow-hidden rounded-md ring-2 transition ${i === activeImg ? 'ring-white' : 'ring-transparent opacity-60 hover:opacity-100'}`}>
+                <img src={img(g)} alt="" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Project title + meta (below gallery, prototype1 style) */}
+      <div className="mx-auto max-w-6xl px-6 pt-7">
+        <h1 className="text-3xl font-bold uppercase leading-tight font-[family-name:var(--font-heading)] text-[#2a2520] md:text-5xl">
+          {project.name}
+        </h1>
+        <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[#574e44]">
+          <span className="inline-flex items-center gap-1.5">
+            <MapPin size={15} className="text-[#80603f]" /> {project.area}
+          </span>
+          <span className="text-black/20">·</span>
+          <span>{project.developer}</span>
+          <span className="ml-1 rounded-full bg-[#80603f]/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-[#6a4b2e]">
+            Project
+          </span>
+        </p>
       </div>
 
       {/* Quick-facts card */}
